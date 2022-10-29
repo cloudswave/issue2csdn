@@ -1,0 +1,21 @@
+name: Github issus to CSDN action
+description: post csdn article from github issue
+branding:
+  icon: arrow-up-circle
+  color: gray-dark
+inputs:
+  issue_url:
+    description: The issue link. Like https://github.com/cloudswave/blog/issues/1
+    required: true
+  token:
+    description: The token to use to access the GitHub API
+    required: true
+  csdn_cookie:
+    description: The cookie after login csdn
+    required: true
+  markdowncontent:
+    description: The markdowncontent for csdn post, Default the issue content
+    required: false
+runs:
+  using: node16
+  main: dist/index.js

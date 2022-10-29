@@ -1,0 +1,35 @@
+{
+  "name": "issue2csdn",
+  "version": "1.0.0",
+  "description": "sync github issue to csdn blog",
+  "main": "dist/index.js",
+  "scripts": {
+		"build": "rm -rf dist && ncc build src/index.js -o dist -m",
+		"bump": "yarn run build && git commit -am 'chore: Bump'",
+		"release": "yarn run bump && yarn version",
+		"postversion": "git push --tags && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cloudswave/issue2csdn.git"
+  },
+  "keywords": [
+    "github",
+    "issues",
+    "csdn"
+  ],
+  "author": "cloudswave",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cloudswave/issue2csdn/issues"
+  },
+  "homepage": "https://github.com/cloudswave/issue2csdn#readme",
+  "dependencies": {
+    "marked": "^0.8.0",
+    "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3",
+    "form-data": "^3.0.0",
+    "node-fetch": "2",
+    "@vercel/ncc": "^0.34.0"
+  }
+}

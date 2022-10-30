@@ -82,8 +82,17 @@ function uploadPictureToCSDN(filePath) {
     })
 }
 
-//上传文章到CSDN
-function publishArticleToCSDN(title, markdowncontent, content, isPublish,  tags) {
+/**
+ * 上传文章到CSDN
+ * @param {*} title 文章标题
+ * @param {*} markdowncontent 全部内容 
+ * @param {*} content 摘要
+ * @param {*} isPublish true时发布，false时保存草稿
+ * @param {*} tags 以逗号隔开
+ * @param {*} articleId 为null则创建文章否则更新文章
+ * @returns 
+ */
+function publishArticleToCSDN(title, markdowncontent, content, isPublish, tags, articleId) {
     return new Promise((resolve, reject) => {
         const parms = {
             title: title,
@@ -94,6 +103,9 @@ function publishArticleToCSDN(title, markdowncontent, content, isPublish,  tags)
             source: "pc_mdeditor",
             level: 1
         };
+        if(Number(articleId) > 0) {
+          parms["id"] = articleId; // 用于更新文章
+        }
         if (isPublish) {
             parms['status'] = 0;
             parms['type'] = 'original';
@@ -130,7 +142,8 @@ function publishArticleToCSDN(title, markdowncontent, content, isPublish,  tags)
                         const url = isPublish ? result.data.url
                                               : 'https://editor.csdn.net/md/?articleId='
                                                 + result.data.id;
-                        resolve(url)
+
+                        resolve(result.data);
                     } else {
                         reject('发布失败,' + result.msg);
                     }
@@ -168,12 +181,28 @@ async function run() {
         issue_number
       });
       const { title, updated_at: updated, labels, number, body: content, created_at: date, html_url }  = issue.data;
-      console.debug('issue:', JSON.stringify(issue));
+      console.log('issue:', JSON.stringify(issue));
       const tags = labels.map((label) => label.name);
       if(!markdowncontent) {
         markdowncontent = content;
       }
-      await publishArticleToCSDN(title, markdowncontent, marked(markdowncontent), true, tags.join(","));
+
+      // 通过正则表达式提取csdn-article-id
+      const csdn_reg = /<!--csdn-article-id:([1-9]\d*)-->(\/?)/;
+      const csdn_tag = markdowncontent.match(csdn_reg)?.[0] || null;
+      const articleId = markdowncontent.match(csdn_reg)?.[1] || null;
+      console.log(`csdn_tag: ${csdn_tag}, articleId:${articleId}`);
+      const article = await publishArticleToCSDN(title, markdowncontent, marked(markdowncontent), true, tags.join(","), articleId);
+      console.log(`publishArticleToCSDN result:${article}`);
+      // 保存id到issue body里用于更新文章
+      if(!csdn_tag && article.id) {
+        await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+          owner,
+          repo,
+          issue_number,
+          body:  content + `\n<!--csdn-article-id:${article.id}-->`
+        });
+      }
 	} catch (err) {
 		core.setFailed(err);
 	}

@@ -1,6 +1,6 @@
 # issue2csdn
 
-GitHub Action which converts GitHub Issue to CSDN post.
+GitHub Action which converts GitHub Issue to [CSDN](https://blog.csdn.net/) post.
 
 ## Example
 
@@ -51,3 +51,6 @@ concurrency:
 | `csdn_cookie`  | The cookie after login csdn. see [the guide](https://github.com/cloudswave/blog/issues/6) | `secrets` | **Yes** |
 | `issue_url`  | The blog issue link. you can use the ${{ github.event.issue.html_url }} | `env` | **Yes** |
 | `markdowncontent`  | The markdowncontent for csdn post, Default the issue content | `env` | **false** |
+
+## Warning
+Don't delete the `<!--csdn-article-id:***-->` at the end of the issue content, It is for supporting to update the csdn blog.

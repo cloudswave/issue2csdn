@@ -53,4 +53,4 @@ concurrency:
 | `markdowncontent`  | The markdowncontent for csdn post, Default the issue content | `env` | **false** |
 
 ## Warning
-Don't delete the `<!--csdn-article-id:***-->` at the end of the issue content, It is for supporting to update the csdn blog.
+Don't delete the `<!--csdn-article-id:***-->` at the end of the issue content, It is used to update the csdn blog when the issue is updated.
